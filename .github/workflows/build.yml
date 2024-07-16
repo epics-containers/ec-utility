@@ -44,26 +44,3 @@ jobs:
         with:
           tags: ${{ env.TAG }}:${{ github.ref_name }}
           push: true
-
-
-  release:
-    # Release on tag push - publish ioc schema
-    needs: [build]
-    if: ${{ github.event_name == 'push' && github.ref_type == 'tag' }}
-    runs-on: ubuntu-latest
-
-    # this job runs in the native developer container we just made
-    container:
-      image: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}-developer:${{ github.ref_name }}
-
-    steps:
-      - name: generate-schema
-        run: |
-          ibek ioc generate-schema --output ibek.ioc.schema.json
-
-      - name: Github Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
-        with:
-          files: |
-            ibek.ioc.schema.json
-          generate_release_notes: true
